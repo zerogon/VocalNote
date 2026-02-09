@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Table,
   TableHeader,
@@ -37,13 +38,14 @@ export function StudentList({ students }: StudentListProps) {
               <TableHead>이름</TableHead>
               <TableHead>휴대폰 번호</TableHead>
               <TableHead className="w-32 text-center">업로드 권한</TableHead>
+              <TableHead className="w-16 text-center">레슨</TableHead>
               <TableHead className="w-24 text-center">관리</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {students.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground">
+                <TableCell colSpan={5} className="text-center text-muted-foreground">
                   등록된 학생이 없습니다.
                 </TableCell>
               </TableRow>
@@ -57,6 +59,13 @@ export function StudentList({ students }: StudentListProps) {
                       studentId={student.id}
                       canUpload={student.canUpload}
                     />
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href={`/admin/students/${student.id}/lessons`}>
+                        레슨
+                      </Link>
+                    </Button>
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-center gap-2">

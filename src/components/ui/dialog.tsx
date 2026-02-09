@@ -4,8 +4,11 @@ import {
   createContext,
   useContext,
   useState,
+  cloneElement,
+  isValidElement,
   type ReactNode,
   type HTMLAttributes,
+  type ReactElement,
 } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -134,8 +137,20 @@ function DialogFooter({
   );
 }
 
-function DialogClose({ children }: { children: ReactNode }) {
+interface DialogCloseProps {
+  children: ReactNode;
+  asChild?: boolean;
+}
+
+function DialogClose({ children, asChild = false }: DialogCloseProps) {
   const { setOpen } = useDialogContext();
+
+  if (asChild && isValidElement(children)) {
+    return cloneElement(children as ReactElement<{ onClick?: () => void }>, {
+      onClick: () => setOpen(false),
+    });
+  }
+
   return (
     <span onClick={() => setOpen(false)} role="button" tabIndex={0}>
       {children}

@@ -1,19 +1,21 @@
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
+import { redirect } from 'next/navigation';
+import { getSession } from '@/lib/auth/session';
+import { LessonList } from '@/components/lessons';
+import { getLessonsByStudent } from '@/actions/lessons';
 
-export default function StudentDashboard() {
+export default async function StudentDashboard() {
+  const sessionData = await getSession();
+
+  if (!sessionData?.user) {
+    redirect('/login/student');
+  }
+
+  const lessons = await getLessonsByStudent(sessionData.user.id);
+
   return (
     <div className="container mx-auto py-8">
-      <h1 className="mb-6 text-2xl font-bold">대시보드</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>환영합니다</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            레슨 기능은 Phase 3에서 추가될 예정입니다.
-          </p>
-        </CardContent>
-      </Card>
+      <h1 className="mb-6 text-2xl font-bold">내 레슨</h1>
+      <LessonList lessons={lessons} isAdmin={false} />
     </div>
   );
 }
