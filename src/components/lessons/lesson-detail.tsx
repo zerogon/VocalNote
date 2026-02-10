@@ -1,8 +1,10 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
+import { RecordingSection } from '@/components/recordings';
 import type { Lesson } from '@/lib/db';
 
 interface LessonDetailProps {
   lesson: Lesson;
+  canUpload?: boolean;
 }
 
 function formatDate(date: Date): string {
@@ -13,15 +15,19 @@ function formatDate(date: Date): string {
   });
 }
 
-export function LessonDetail({ lesson }: LessonDetailProps) {
+export function LessonDetail({ lesson, canUpload = false }: LessonDetailProps) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>{formatDate(lesson.date)}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         <div className="whitespace-pre-wrap">{lesson.content}</div>
-        {/* Phase 4: 녹음 재생 UI 추가 예정 */}
+        <RecordingSection
+          lessonId={lesson.id}
+          recordingId={lesson.recordingId}
+          canUpload={canUpload}
+        />
       </CardContent>
     </Card>
   );

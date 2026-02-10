@@ -37,13 +37,13 @@ export default async function LessonDetailPage({
   }
 
   return (
-    <div className="container mx-auto py-8">
+    <div>
       <div className="mb-6">
-        <Button variant="outline" asChild>
+        <Button variant="outline" size="sm" asChild>
           <Link href="/student/dashboard">목록으로</Link>
         </Button>
       </div>
-      <LessonDetail lesson={lesson} />
+      <LessonDetail lesson={lesson} canUpload={sessionData.user.canUpload} />
     </div>
   );
 }

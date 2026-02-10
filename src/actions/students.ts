@@ -1,13 +1,27 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { eq } from 'drizzle-orm';
-import { db, users, type User } from '@/lib/db';
+import { eq, count } from 'drizzle-orm';
+import { db, users, lessons, type User } from '@/lib/db';
 import { studentFormSchema } from '@/lib/validations/auth';
 
 export interface ActionResult {
   success?: boolean;
   error?: string;
+}
+
+export async function getAdminStats() {
+  const [studentCount] = await db
+    .select({ count: count() })
+    .from(users)
+    .where(eq(users.role, 'user'));
+
+  const [lessonCount] = await db.select({ count: count() }).from(lessons);
+
+  return {
+    totalStudents: studentCount.count,
+    totalLessons: lessonCount.count,
+  };
 }
 
 export async function getStudents(): Promise<User[]> {

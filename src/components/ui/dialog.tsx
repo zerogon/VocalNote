@@ -78,7 +78,7 @@ function DialogContent({
       />
       <div
         className={cn(
-          'relative z-50 w-full max-w-lg rounded-lg border bg-background p-6 shadow-lg',
+          'relative z-50 mx-4 w-full max-w-lg rounded-lg border bg-background p-4 shadow-lg sm:mx-auto sm:p-6',
           className
         )}
         {...props}

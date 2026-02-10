@@ -36,9 +36,9 @@ export default async function LessonsPage({ params }: LessonsPageProps) {
   const lessons = await getLessonsByStudent(studentId);
 
   return (
-    <div className="container mx-auto py-8">
+    <div>
       <div className="mb-6 flex items-center gap-4">
-        <Button variant="outline" asChild>
+        <Button variant="outline" size="sm" asChild>
           <Link href="/admin/students">목록으로</Link>
         </Button>
         <h1 className="text-2xl font-bold">{student.name} - 레슨 관리</h1>

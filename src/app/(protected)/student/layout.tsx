@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
 import { ROUTES } from '@/lib/auth/constants';
-import { LogoutButton } from '@/components/auth';
+import { AppHeader } from '@/components/layout';
 
 export default async function StudentLayout({
   children,
@@ -21,14 +21,13 @@ export default async function StudentLayout({
   const userName = sessionData.user?.name ?? '학생';
 
   return (
-    <div className="min-h-screen">
-      <header className="border-b">
-        <div className="container mx-auto flex items-center justify-between py-4">
-          <span className="font-semibold">{userName}님</span>
-          <LogoutButton />
-        </div>
-      </header>
-      <main>{children}</main>
+    <div className="min-h-screen bg-background">
+      <AppHeader
+        title={`${userName}님`}
+        homeHref={ROUTES.STUDENT_DASHBOARD}
+        nav={[{ label: '내 레슨', href: ROUTES.STUDENT_DASHBOARD }]}
+      />
+      <main className="mx-auto max-w-screen-lg px-4 py-6">{children}</main>
     </div>
   );
 }
