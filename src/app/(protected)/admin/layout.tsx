@@ -25,7 +25,7 @@ export default async function AdminLayout({
         homeHref={ROUTES.ADMIN_STUDENTS}
         nav={[{ label: '학생 관리', href: ROUTES.ADMIN_STUDENTS }]}
       />
-      <main className="mx-auto max-w-screen-lg px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-screen-lg px-4 py-8">{children}</main>
     </div>
   );
 }

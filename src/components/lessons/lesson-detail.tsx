@@ -22,12 +22,14 @@ export function LessonDetail({ lesson, canUpload = false }: LessonDetailProps) {
         <CardTitle>{formatDate(lesson.date)}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="whitespace-pre-wrap">{lesson.content}</div>
+        <div className="whitespace-pre-wrap leading-relaxed text-foreground/90">{lesson.content}</div>
+        <div className="border-t border-border/40 pt-6">
         <RecordingSection
           lessonId={lesson.id}
           recordingId={lesson.recordingId}
           canUpload={canUpload}
         />
+        </div>
       </CardContent>
     </Card>
   );

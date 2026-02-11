@@ -19,16 +19,18 @@ export default async function StudentDashboard() {
     <div>
       <h1 className="mb-6 text-2xl font-bold">내 레슨</h1>
 
-      <div className="mb-6 grid grid-cols-2 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-primary">{lessons.length}</p>
-            <p className="text-sm text-muted-foreground">총 레슨</p>
+      <div className="mb-8 grid grid-cols-2 gap-4">
+        <Card className="overflow-hidden">
+          <CardContent className="relative p-5 text-center">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-primary/60" />
+            <p className="text-3xl font-bold text-primary">{lessons.length}</p>
+            <p className="mt-1 text-sm text-muted-foreground">총 레슨</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <p className="text-sm font-bold text-primary">
+        <Card className="overflow-hidden">
+          <CardContent className="relative p-5 text-center">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary/60 to-accent-foreground" />
+            <p className="text-lg font-bold text-primary">
               {lastLesson
                 ? lastLesson.date.toLocaleDateString('ko-KR', {
                     month: 'short',
@@ -36,7 +38,7 @@ export default async function StudentDashboard() {
                   })
                 : '-'}
             </p>
-            <p className="text-sm text-muted-foreground">최근 레슨</p>
+            <p className="mt-1 text-sm text-muted-foreground">최근 레슨</p>
           </CardContent>
         </Card>
       </div>

@@ -11,14 +11,14 @@ interface LoginModeToggleProps {
 
 export function LoginModeToggle({ mode, onModeChange }: LoginModeToggleProps) {
   return (
-    <div className="flex rounded-lg bg-muted p-1">
+    <div className="flex rounded-xl bg-muted/70 p-1">
       <button
         type="button"
         onClick={() => onModeChange('student')}
         className={cn(
-          'flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors',
+          'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
           mode === 'student'
-            ? 'bg-background text-foreground shadow-sm'
+            ? 'bg-white text-foreground shadow-sm shadow-black/[0.06]'
             : 'text-muted-foreground hover:text-foreground'
         )}
       >
@@ -28,9 +28,9 @@ export function LoginModeToggle({ mode, onModeChange }: LoginModeToggleProps) {
         type="button"
         onClick={() => onModeChange('admin')}
         className={cn(
-          'flex-1 rounded-md px-4 py-2 text-sm font-medium transition-colors',
+          'flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200',
           mode === 'admin'
-            ? 'bg-background text-foreground shadow-sm'
+            ? 'bg-white text-foreground shadow-sm shadow-black/[0.06]'
             : 'text-muted-foreground hover:text-foreground'
         )}
       >

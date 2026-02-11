@@ -27,7 +27,7 @@ export default async function StudentLayout({
         homeHref={ROUTES.STUDENT_DASHBOARD}
         nav={[{ label: '내 레슨', href: ROUTES.STUDENT_DASHBOARD }]}
       />
-      <main className="mx-auto max-w-screen-lg px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-screen-lg px-4 py-8">{children}</main>
     </div>
   );
 }

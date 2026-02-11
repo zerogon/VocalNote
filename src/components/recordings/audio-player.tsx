@@ -76,14 +76,14 @@ export function AudioPlayer({ fileId }: AudioPlayerProps) {
   };
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-muted/30 p-3">
+    <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-muted/20 p-3">
       <audio ref={audioRef} src={`/api/recordings/${fileId}`} preload="metadata" />
       <Button
         variant="outline"
         size="sm"
         onClick={togglePlay}
         disabled={isLoading}
-        className="h-9 w-9 shrink-0 p-0"
+        className="h-9 w-9 shrink-0 rounded-full p-0"
       >
         {isLoading ? (
           <span className="text-xs">...</span>

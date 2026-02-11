@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf9fb;
+  --foreground: #1a1625;
   --card: #ffffff;
-  --card-foreground: #171717;
-  --primary: #6d28d9;
+  --card-foreground: #1a1625;
+  --primary: #7c3aed;
   --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --secondary-foreground: #171717;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --accent: #f3e8ff;
+  --secondary: #f1eff5;
+  --secondary-foreground: #1a1625;
+  --muted: #f1eff5;
+  --muted-foreground: #71717a;
+  --accent: #ede9fe;
   --accent-foreground: #6d28d9;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #e5e7eb;
-  --input: #e5e7eb;
-  --ring: #6d28d9;
+  --border: #e8e5ee;
+  --input: #e8e5ee;
+  --ring: #7c3aed;
 }
 
 @theme inline {
@@ -42,30 +42,45 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --card: #171717;
-    --card-foreground: #ededed;
-    --primary: #a78bfa;
-    --primary-foreground: #0a0a0a;
-    --secondary: #1f2937;
-    --secondary-foreground: #ededed;
-    --muted: #1f2937;
-    --muted-foreground: #9ca3af;
-    --accent: #2e1065;
-    --accent-foreground: #a78bfa;
-    --destructive: #dc2626;
-    --destructive-foreground: #ededed;
-    --border: #374151;
-    --input: #374151;
-    --ring: #a78bfa;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+@keyframes dialogIn {
+  from { opacity: 0; transform: scale(0.95) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.animate-dialog-in {
+  animation: dialogIn 0.2s ease-out;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px; background: var(--muted);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+input[type="range"]::-moz-range-track {
+  height: 4px; border-radius: 2px; background: var(--muted);
 }

@@ -33,7 +33,7 @@ export function InstallPrompt() {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-sm rounded-lg border bg-card p-4 shadow-lg">
+    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-sm rounded-xl border border-border/60 bg-white p-4 shadow-lg shadow-black/[0.08]">
       <p className="mb-2 text-sm font-medium">
         홈 화면에 추가하면 앱처럼 사용할 수 있어요
       </p>

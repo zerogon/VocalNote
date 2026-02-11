@@ -73,12 +73,12 @@ function DialogContent({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="fixed inset-0 bg-black/50"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
         onClick={() => setOpen(false)}
       />
       <div
         className={cn(
-          'relative z-50 mx-4 w-full max-w-lg rounded-lg border bg-background p-4 shadow-lg sm:mx-auto sm:p-6',
+          'relative z-50 mx-4 w-full max-w-lg rounded-xl border border-border/60 bg-background p-4 shadow-xl shadow-black/[0.08] animate-dialog-in sm:mx-auto sm:p-6',
           className
         )}
         {...props}

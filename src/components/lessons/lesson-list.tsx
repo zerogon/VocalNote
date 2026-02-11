@@ -73,7 +73,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                         {formatDate(lesson.date)}
                       </span>
                       {lesson.recordingId && (
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                           녹음
                         </span>
                       )}
@@ -85,7 +85,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                   <p className="line-clamp-2 text-sm text-foreground">
                     {lesson.content}
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2 border-t border-border/40 pt-3">
                     {isAdmin ? (
                       <>
                         <Button
@@ -136,7 +136,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
           </div>
 
           {/* 데스크톱: 테이블 */}
-          <div className="hidden rounded-md border md:block">
+          <div className="hidden md:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -162,7 +162,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                     </TableCell>
                     <TableCell className="text-center">
                       {lesson.recordingId ? (
-                        <span className="text-primary" title="녹음 있음">●</span>
+                        <span className="inline-block h-2 w-2 rounded-full bg-primary" title="녹음 있음" />
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}

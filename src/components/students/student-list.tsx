@@ -48,7 +48,7 @@ export function StudentList({ students }: StudentListProps) {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                      <p className="font-medium">{student.name}</p>
+                      <p className="font-semibold">{student.name}</p>
                       <p className="text-sm text-muted-foreground">
                         {student.phone}
                       </p>
@@ -58,7 +58,7 @@ export function StudentList({ students }: StudentListProps) {
                       canUpload={student.canUpload}
                     />
                   </div>
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-3 flex gap-2 border-t border-border/40 pt-3">
                     <Button variant="outline" size="sm" asChild>
                       <Link href={`/admin/students/${student.id}/lessons`}>
                         레슨
@@ -86,7 +86,7 @@ export function StudentList({ students }: StudentListProps) {
           </div>
 
           {/* 데스크톱: 테이블 */}
-          <div className="hidden rounded-md border md:block">
+          <div className="hidden md:block">
             <Table>
               <TableHeader>
                 <TableRow>

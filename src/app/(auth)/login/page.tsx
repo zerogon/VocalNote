@@ -12,10 +12,13 @@ export default function LoginPage() {
   const [mode, setMode] = useState<LoginMode>('student');
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="space-y-4">
-          <CardTitle className="text-center">로그인</CardTitle>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-accent/30 p-4">
+      <Card className="w-full max-w-sm shadow-lg shadow-black/[0.06]">
+        <CardHeader className="space-y-4 text-center">
+          <div>
+            <p className="text-2xl font-bold tracking-wide text-primary">VOCAL LOG</p>
+            <p className="mt-1 text-sm text-muted-foreground">보컬 레슨 관리</p>
+          </div>
           <LoginModeToggle mode={mode} onModeChange={setMode} />
         </CardHeader>
         <CardContent>
