@@ -19,10 +19,19 @@ export function LessonDetail({ lesson, canUpload = false }: LessonDetailProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{formatDate(lesson.date)}</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle>
+            {lesson.songTitle
+              ? `${lesson.songTitle} - ${lesson.sessionNumber}회차`
+              : formatDate(lesson.date)}
+          </CardTitle>
+        </div>
+        {lesson.songTitle && (
+          <p className="text-sm text-muted-foreground">{formatDate(lesson.date)}</p>
+        )}
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="whitespace-pre-wrap leading-relaxed text-foreground/90">{lesson.content}</div>
+        <div className="whitespace-pre-wrap break-words leading-relaxed text-foreground/90">{lesson.content}</div>
         <div className="border-t border-border/40 pt-6">
         <RecordingSection
           lessonId={lesson.id}

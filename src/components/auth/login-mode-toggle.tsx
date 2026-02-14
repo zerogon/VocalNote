@@ -34,7 +34,7 @@ export function LoginModeToggle({ mode, onModeChange }: LoginModeToggleProps) {
             : 'text-muted-foreground hover:text-foreground'
         )}
       >
-        관리자
+        선생님
       </button>
     </div>
   );

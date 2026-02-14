@@ -14,13 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VOCAL LOG",
+  title: "VOCAL NOTE",
   description: "보컬 레슨 관리 서비스",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "VOCAL LOG",
+    title: "VOCAL NOTE",
   },
   formatDetection: {
     telephone: false,

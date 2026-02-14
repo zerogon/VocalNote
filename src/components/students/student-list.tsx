@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Table,
   TableHeader,
@@ -23,6 +23,7 @@ interface StudentListProps {
 }
 
 export function StudentList({ students }: StudentListProps) {
+  const router = useRouter();
   const [editingStudent, setEditingStudent] = useState<User | null>(null);
   const [deletingStudent, setDeletingStudent] = useState<User | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -44,7 +45,11 @@ export function StudentList({ students }: StudentListProps) {
           {/* 모바일: 카드 리스트 */}
           <div className="space-y-3 md:hidden">
             {students.map((student) => (
-              <Card key={student.id}>
+              <Card
+                key={student.id}
+                className="cursor-pointer transition-colors hover:bg-accent/40"
+                onClick={() => router.push(`/admin/students/${student.id}/lessons`)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
@@ -53,28 +58,25 @@ export function StudentList({ students }: StudentListProps) {
                         {student.phone}
                       </p>
                     </div>
-                    <UploadToggle
-                      studentId={student.id}
-                      canUpload={student.canUpload}
-                    />
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <UploadToggle
+                        studentId={student.id}
+                        canUpload={student.canUpload}
+                      />
+                    </div>
                   </div>
-                  <div className="mt-3 flex gap-2 border-t border-border/40 pt-3">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/admin/students/${student.id}/lessons`}>
-                        레슨
-                      </Link>
-                    </Button>
+                  <div className="mt-3 flex gap-2 border-t border-border/40 pt-3" onClick={(e) => e.stopPropagation()}>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={() => setEditingStudent(student)}
                     >
                       수정
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
-                      className="text-destructive"
+                      className="border-destructive/30 text-destructive hover:bg-destructive/10"
                       onClick={() => setDeletingStudent(student)}
                     >
                       삭제
@@ -95,42 +97,39 @@ export function StudentList({ students }: StudentListProps) {
                   <TableHead className="w-32 text-center">
                     업로드 권한
                   </TableHead>
-                  <TableHead className="w-16 text-center">레슨</TableHead>
-                  <TableHead className="w-24 text-center">관리</TableHead>
+                  <TableHead className="text-center">관리</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {students.map((student) => (
-                  <TableRow key={student.id}>
+                  <TableRow
+                    key={student.id}
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/admin/students/${student.id}/lessons`)}
+                  >
                     <TableCell className="font-medium">
                       {student.name}
                     </TableCell>
                     <TableCell>{student.phone}</TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
                       <UploadToggle
                         studentId={student.id}
                         canUpload={student.canUpload}
                       />
                     </TableCell>
-                    <TableCell className="text-center">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={`/admin/students/${student.id}/lessons`}>
-                          레슨
-                        </Link>
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex justify-center gap-2">
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <div className="flex flex-nowrap justify-center gap-1">
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
                           onClick={() => setEditingStudent(student)}
                         >
                           수정
                         </Button>
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
+                          className="border-destructive/30 text-destructive hover:bg-destructive/10"
                           onClick={() => setDeletingStudent(student)}
                         >
                           삭제

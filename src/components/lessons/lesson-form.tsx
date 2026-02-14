@@ -66,9 +66,34 @@ export function LessonForm({
               id="date"
               name="date"
               type="date"
-              defaultValue={lesson ? formatDateForInput(lesson.date) : ''}
+              defaultValue={formatDateForInput(lesson?.date ?? new Date())}
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="songTitle">노래 제목</Label>
+            <Input
+              id="songTitle"
+              name="songTitle"
+              placeholder="노래 제목을 입력해주세요."
+              defaultValue={lesson?.songTitle ?? ''}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="sessionNumber">회차</Label>
+            <select
+              id="sessionNumber"
+              name="sessionNumber"
+              defaultValue={lesson?.sessionNumber ?? 1}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              {[1, 2, 3, 4].map((n) => (
+                <option key={n} value={n}>
+                  {n}회차
+                </option>
+              ))}
+            </select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="content">레슨 내용</Label>

@@ -35,6 +35,8 @@ export async function addLesson(
 ): Promise<ActionResult> {
   const rawData = {
     date: formData.get('date'),
+    songTitle: formData.get('songTitle'),
+    sessionNumber: formData.get('sessionNumber'),
     content: formData.get('content'),
   };
 
@@ -46,6 +48,8 @@ export async function addLesson(
   await db.insert(lessons).values({
     studentId,
     date: new Date(result.data.date),
+    songTitle: result.data.songTitle,
+    sessionNumber: result.data.sessionNumber,
     content: result.data.content,
   });
 
@@ -60,6 +64,8 @@ export async function updateLesson(
 ): Promise<ActionResult> {
   const rawData = {
     date: formData.get('date'),
+    songTitle: formData.get('songTitle'),
+    sessionNumber: formData.get('sessionNumber'),
     content: formData.get('content'),
   };
 
@@ -77,6 +83,8 @@ export async function updateLesson(
     .update(lessons)
     .set({
       date: new Date(result.data.date),
+      songTitle: result.data.songTitle,
+      sessionNumber: result.data.sessionNumber,
       content: result.data.content,
       updatedAt: new Date(),
     })

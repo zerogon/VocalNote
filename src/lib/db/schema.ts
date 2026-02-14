@@ -35,6 +35,8 @@ export const lessons = pgTable('lessons', {
     .references(() => users.id, { onDelete: 'cascade' })
     .notNull(),
   date: timestamp('date').notNull(),
+  songTitle: varchar('song_title', { length: 200 }).notNull().default(''),
+  sessionNumber: integer('session_number').notNull().default(1),
   content: text('content').notNull(),
   recordingId: varchar('recording_id', { length: 255 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),

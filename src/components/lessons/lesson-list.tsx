@@ -44,7 +44,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [deletingLesson, setDeletingLesson] = useState<Lesson | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [uploadingLessonId, setUploadingLessonId] = useState<number | null>(null);
+
 
   return (
     <div className="space-y-4">
@@ -72,6 +72,9 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                       <span className="text-sm font-medium text-primary">
                         {formatDate(lesson.date)}
                       </span>
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                        {lesson.sessionNumber}회차
+                      </span>
                       {lesson.recordingId && (
                         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                           녹음
@@ -82,39 +85,34 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                       {formatShortDate(lesson.createdAt)}
                     </span>
                   </div>
-                  <p className="line-clamp-2 text-sm text-foreground">
+                  {lesson.songTitle && (
+                    <p className="mb-1 text-sm font-medium text-foreground">
+                      {lesson.songTitle}
+                    </p>
+                  )}
+                  <p className="line-clamp-2 text-sm text-foreground/80">
                     {lesson.content}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2 border-t border-border/40 pt-3">
                     {isAdmin ? (
                       <>
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
                           onClick={() => setEditingLesson(lesson)}
                         >
                           수정
                         </Button>
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
-                          className="text-destructive"
+                          className="border-destructive/30 text-destructive hover:bg-destructive/10"
                           onClick={() => setDeletingLesson(lesson)}
                         >
                           삭제
                         </Button>
                         {!lesson.recordingId && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              setUploadingLessonId(
-                                uploadingLessonId === lesson.id ? null : lesson.id
-                              )
-                            }
-                          >
-                            녹음 업로드
-                          </Button>
+                          <RecordingUpload lessonId={lesson.id} />
                         )}
                       </>
                     ) : (
@@ -125,11 +123,6 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                       </Button>
                     )}
                   </div>
-                  {isAdmin && uploadingLessonId === lesson.id && (
-                    <div className="mt-3">
-                      <RecordingUpload lessonId={lesson.id} />
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             ))}
@@ -141,10 +134,11 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
               <TableHeader>
                 <TableRow>
                   <TableHead>날짜</TableHead>
-                  <TableHead>레슨 내용</TableHead>
+                  <TableHead>노래 제목</TableHead>
+                  <TableHead className="w-20 text-center whitespace-nowrap">회차</TableHead>
                   <TableHead className="w-20 text-center">녹음</TableHead>
                   <TableHead className="w-32 text-center">등록일</TableHead>
-                  <TableHead className="w-36 text-center">
+                  <TableHead className="text-center">
                     {isAdmin ? '관리' : ''}
                   </TableHead>
                 </TableRow>
@@ -155,10 +149,11 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                     <TableCell className="whitespace-nowrap font-medium">
                       {formatDate(lesson.date)}
                     </TableCell>
-                    <TableCell className="max-w-md truncate">
-                      {lesson.content.length > 100
-                        ? lesson.content.substring(0, 100) + '...'
-                        : lesson.content}
+                    <TableCell className="max-w-[200px] truncate">
+                      {lesson.songTitle || '-'}
+                    </TableCell>
+                    <TableCell className="text-center whitespace-nowrap">
+                      {lesson.sessionNumber}회차
                     </TableCell>
                     <TableCell className="text-center">
                       {lesson.recordingId ? (
@@ -171,52 +166,36 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                       {formatShortDate(lesson.createdAt)}
                     </TableCell>
                     <TableCell>
-                      <div className="flex justify-center gap-1">
+                      <div className="flex flex-nowrap justify-center gap-1">
                         {isAdmin ? (
                           <>
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
                               onClick={() => setEditingLesson(lesson)}
                             >
                               수정
                             </Button>
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
+                              className="border-destructive/30 text-destructive hover:bg-destructive/10"
                               onClick={() => setDeletingLesson(lesson)}
                             >
                               삭제
                             </Button>
                             {!lesson.recordingId && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  setUploadingLessonId(
-                                    uploadingLessonId === lesson.id
-                                      ? null
-                                      : lesson.id
-                                  )
-                                }
-                              >
-                                업로드
-                              </Button>
+                              <RecordingUpload lessonId={lesson.id} label="업로드" />
                             )}
                           </>
                         ) : (
-                          <Button variant="ghost" size="sm" asChild>
+                          <Button variant="outline" size="sm" asChild>
                             <Link href={`/student/lessons/${lesson.id}`}>
                               상세 보기
                             </Link>
                           </Button>
                         )}
                       </div>
-                      {isAdmin && uploadingLessonId === lesson.id && (
-                        <div className="mt-2">
-                          <RecordingUpload lessonId={lesson.id} />
-                        </div>
-                      )}
                     </TableCell>
                   </TableRow>
                 ))}
