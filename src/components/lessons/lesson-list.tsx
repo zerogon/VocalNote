@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Table,
@@ -41,6 +42,7 @@ function formatShortDate(date: Date): string {
 }
 
 export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
+  const router = useRouter();
   const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
   const [deletingLesson, setDeletingLesson] = useState<Lesson | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -65,7 +67,11 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
           {/* 모바일: 카드 리스트 */}
           <div className="space-y-3 md:hidden">
             {lessons.map((lesson) => (
-              <Card key={lesson.id}>
+              <Card
+                key={lesson.id}
+                className={!isAdmin ? 'cursor-pointer transition-colors hover:bg-muted/50' : ''}
+                onClick={!isAdmin ? () => router.push(`/student/lessons/${lesson.id}`) : undefined}
+              >
                 <CardContent className="p-4">
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -93,36 +99,28 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                   <p className="line-clamp-2 text-sm text-foreground/80">
                     {lesson.content}
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2 border-t border-border/40 pt-3">
-                    {isAdmin ? (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditingLesson(lesson)}
-                        >
-                          수정
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                          onClick={() => setDeletingLesson(lesson)}
-                        >
-                          삭제
-                        </Button>
-                        {!lesson.recordingId && (
-                          <RecordingUpload lessonId={lesson.id} />
-                        )}
-                      </>
-                    ) : (
-                      <Button variant="outline" size="sm" asChild>
-                        <Link href={`/student/lessons/${lesson.id}`}>
-                          상세 보기
-                        </Link>
+                  {isAdmin && (
+                    <div className="mt-3 flex flex-wrap gap-2 border-t border-border/40 pt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingLesson(lesson)}
+                      >
+                        수정
                       </Button>
-                    )}
-                  </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                        onClick={() => setDeletingLesson(lesson)}
+                      >
+                        삭제
+                      </Button>
+                      {!lesson.recordingId && (
+                        <RecordingUpload lessonId={lesson.id} />
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
@@ -138,14 +136,18 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                   <TableHead className="w-20 text-center whitespace-nowrap">회차</TableHead>
                   <TableHead className="w-20 text-center">녹음</TableHead>
                   <TableHead className="w-32 text-center">등록일</TableHead>
-                  <TableHead className="text-center">
-                    {isAdmin ? '관리' : ''}
-                  </TableHead>
+                  {isAdmin && (
+                    <TableHead className="text-center">관리</TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {lessons.map((lesson) => (
-                  <TableRow key={lesson.id}>
+                  <TableRow
+                    key={lesson.id}
+                    className={!isAdmin ? 'cursor-pointer transition-colors hover:bg-muted/50' : ''}
+                    onClick={!isAdmin ? () => router.push(`/student/lessons/${lesson.id}`) : undefined}
+                  >
                     <TableCell className="whitespace-nowrap font-medium">
                       {formatDate(lesson.date)}
                     </TableCell>
@@ -165,38 +167,30 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                     <TableCell className="text-center text-muted-foreground">
                       {formatShortDate(lesson.createdAt)}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-nowrap justify-center gap-1">
-                        {isAdmin ? (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingLesson(lesson)}
-                            >
-                              수정
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                              onClick={() => setDeletingLesson(lesson)}
-                            >
-                              삭제
-                            </Button>
-                            {!lesson.recordingId && (
-                              <RecordingUpload lessonId={lesson.id} label="업로드" />
-                            )}
-                          </>
-                        ) : (
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href={`/student/lessons/${lesson.id}`}>
-                              상세 보기
-                            </Link>
+                    {isAdmin && (
+                      <TableCell>
+                        <div className="flex flex-nowrap justify-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingLesson(lesson)}
+                          >
+                            수정
                           </Button>
-                        )}
-                      </div>
-                    </TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                            onClick={() => setDeletingLesson(lesson)}
+                          >
+                            삭제
+                          </Button>
+                          {!lesson.recordingId && (
+                            <RecordingUpload lessonId={lesson.id} label="업로드" />
+                          )}
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
