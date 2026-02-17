@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { eq } from 'drizzle-orm';
-import { db, lessons } from '@/lib/db';
+import { db, lessons, users } from '@/lib/db';
 import { getSession } from '@/lib/auth/session';
-import { uploadFile, deleteFile } from '@/lib/google-drive';
+import { uploadFile, deleteFile, resolveUploadFolder } from '@/lib/google-drive';
 import { validateAudioFile } from '@/lib/validations/recording';
 
 export async function POST(request: NextRequest) {
@@ -70,11 +70,34 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // 학생 이름 조회
+  const student = await db
+    .select({ name: users.name })
+    .from(users)
+    .where(eq(users.id, targetLesson.studentId))
+    .limit(1);
+
+  const studentName = student.length > 0 ? student[0].name : '알수없음';
+  const songTitle = targetLesson.songTitle || '무제';
+
+  // KST 기준 업로드 날짜
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const year = kst.getUTCFullYear().toString();
+  const month = String(kst.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(kst.getUTCDate()).padStart(2, '0');
+  const dateStr = `${year}${month}${day}`;
+
+  // 파일명에 부적합한 문자 제거
+  const sanitize = (s: string) => s.replace(/[/\\*?"<>|]/g, '');
+
   const buffer = Buffer.from(await file.arrayBuffer());
   const ext = file.name.split('.').pop() || 'mp3';
-  const fileName = `${targetLesson.studentId}_${targetLesson.id}_${Date.now()}.${ext}`;
+  const fileName = `${sanitize(studentName)}_${sanitize(songTitle)}_${dateStr}.${ext}`;
 
-  const fileId = await uploadFile(buffer, fileName, file.type);
+  // 폴더 구조: 년도/학생이름/
+  const folderId = await resolveUploadFolder(year, sanitize(studentName));
+  const fileId = await uploadFile(buffer, fileName, file.type, folderId);
 
   await db
     .update(lessons)

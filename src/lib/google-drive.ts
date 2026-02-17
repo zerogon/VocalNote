@@ -13,10 +13,51 @@ const drive = google.drive({ version: 'v3', auth });
 
 const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID!;
 
+async function findOrCreateFolder(
+  name: string,
+  parentId: string
+): Promise<string> {
+  const query = `name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+  const list = await drive.files.list({
+    q: query,
+    fields: 'files(id)',
+    spaces: 'drive',
+  });
+
+  if (list.data.files && list.data.files.length > 0 && list.data.files[0].id) {
+    return list.data.files[0].id;
+  }
+
+  const created = await drive.files.create({
+    requestBody: {
+      name,
+      parents: [parentId],
+      mimeType: 'application/vnd.google-apps.folder',
+    },
+    fields: 'id',
+  });
+
+  if (!created.data.id) {
+    throw new Error(`폴더 생성에 실패했습니다: ${name}`);
+  }
+
+  return created.data.id;
+}
+
+export async function resolveUploadFolder(
+  year: string,
+  studentName: string
+): Promise<string> {
+  const yearFolderId = await findOrCreateFolder(year, FOLDER_ID);
+  const studentFolderId = await findOrCreateFolder(studentName, yearFolderId);
+  return studentFolderId;
+}
+
 export async function uploadFile(
   buffer: Buffer,
   fileName: string,
-  mimeType: string
+  mimeType: string,
+  parentFolderId?: string
 ): Promise<string> {
   const readable = new Readable();
   readable.push(buffer);
@@ -25,7 +66,7 @@ export async function uploadFile(
   const response = await drive.files.create({
     requestBody: {
       name: fileName,
-      parents: [FOLDER_ID],
+      parents: [parentFolderId || FOLDER_ID],
     },
     media: {
       mimeType,
