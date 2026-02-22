@@ -65,11 +65,11 @@ export function StudentList({ students }: StudentListProps) {
                       />
                     </div>
                   </div>
-                  <div className="mt-3 flex gap-2 border-t border-border/40 pt-3" onClick={(e) => e.stopPropagation()}>
+                  <div className="mt-3 flex gap-2 border-t border-border/40 pt-3">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setEditingStudent(student)}
+                      onClick={(e) => { e.stopPropagation(); setEditingStudent(student); }}
                     >
                       수정
                     </Button>
@@ -77,7 +77,7 @@ export function StudentList({ students }: StudentListProps) {
                       variant="outline"
                       size="sm"
                       className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                      onClick={() => setDeletingStudent(student)}
+                      onClick={(e) => { e.stopPropagation(); setDeletingStudent(student); }}
                     >
                       삭제
                     </Button>
