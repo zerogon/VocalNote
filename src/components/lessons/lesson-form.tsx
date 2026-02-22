@@ -106,6 +106,16 @@ export function LessonForm({
               required
             />
           </div>
+          {isEditing && lesson.studentMemo && (
+            <div className="rounded-lg border-l-2 border-primary/30 bg-accent/40 px-4 py-3">
+              <p className="mb-1.5 text-xs font-semibold tracking-wide text-accent-foreground">
+                학생 메모
+              </p>
+              <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground/80">
+                {lesson.studentMemo}
+              </p>
+            </div>
+          )}
           {error && <p className="text-sm text-destructive">{error}</p>}
           <DialogFooter>
             <DialogClose asChild>

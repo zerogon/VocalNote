@@ -86,6 +86,11 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                           녹음
                         </span>
                       )}
+                      {lesson.studentMemo && (
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                          메모
+                        </span>
+                      )}
                     </div>
                     <span className="text-xs text-muted-foreground">
                       {formatShortDate(lesson.createdAt)}
@@ -130,6 +135,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                   <TableHead>노래 제목</TableHead>
                   <TableHead className="w-20 text-center whitespace-nowrap">회차</TableHead>
                   <TableHead className="w-20 text-center">녹음</TableHead>
+                  <TableHead className="w-20 text-center">메모</TableHead>
                   <TableHead className="w-32 text-center">등록일</TableHead>
                   {isAdmin && (
                     <TableHead className="text-center">관리</TableHead>
@@ -155,6 +161,13 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                     <TableCell className="text-center">
                       {lesson.recordingId ? (
                         <span className="inline-block h-2 w-2 rounded-full bg-primary" title="녹음 있음" />
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {lesson.studentMemo ? (
+                        <span className="inline-block h-2 w-2 rounded-full bg-primary" title="메모 있음" />
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
