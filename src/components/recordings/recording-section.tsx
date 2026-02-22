@@ -32,7 +32,10 @@ export function RecordingSection({
   if (recordingId) {
     return (
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground">녹음</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-medium text-muted-foreground">녹음</h3>
+          <span className="text-xs text-muted-foreground/60">(재생 시작까지 잠시 지연될 수 있습니다)</span>
+        </div>
         <AudioPlayer fileId={recordingId} />
         {canUpload && (
           <div className="flex gap-2">

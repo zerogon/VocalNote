@@ -15,6 +15,7 @@ import {
 } from '@/components/ui';
 import { addLesson, updateLesson } from '@/actions/lessons';
 import type { Lesson } from '@/lib/db';
+import { RecordingSection } from '@/components/recordings/recording-section';
 
 interface LessonFormProps {
   studentId: number;
@@ -128,6 +129,15 @@ export function LessonForm({
             </Button>
           </DialogFooter>
         </form>
+        {isEditing && lesson.recordingId && (
+          <div className="border-t border-border/40 pt-4">
+            <RecordingSection
+              lessonId={lesson.id}
+              recordingId={lesson.recordingId}
+              canUpload={false}
+            />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
