@@ -69,8 +69,8 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
             {lessons.map((lesson) => (
               <Card
                 key={lesson.id}
-                className={!isAdmin ? 'cursor-pointer transition-colors hover:bg-muted/50' : ''}
-                onClick={!isAdmin ? () => router.push(`/student/lessons/${lesson.id}`) : undefined}
+                className="cursor-pointer transition-colors hover:bg-muted/50"
+                onClick={isAdmin ? () => setEditingLesson(lesson) : () => router.push(`/student/lessons/${lesson.id}`)}
               >
                 <CardContent className="p-4">
                   <div className="mb-2 flex items-center justify-between">
@@ -104,20 +104,15 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setEditingLesson(lesson)}
-                      >
-                        수정
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); setDeletingLesson(lesson); }}
                         className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                        onClick={() => setDeletingLesson(lesson)}
                       >
                         삭제
                       </Button>
                       {!lesson.recordingId && (
-                        <RecordingUpload lessonId={lesson.id} />
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <RecordingUpload lessonId={lesson.id} />
+                        </div>
                       )}
                     </div>
                   )}
@@ -145,8 +140,8 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                 {lessons.map((lesson) => (
                   <TableRow
                     key={lesson.id}
-                    className={!isAdmin ? 'cursor-pointer transition-colors hover:bg-muted/50' : ''}
-                    onClick={!isAdmin ? () => router.push(`/student/lessons/${lesson.id}`) : undefined}
+                    className="cursor-pointer transition-colors hover:bg-muted/50"
+                    onClick={isAdmin ? () => setEditingLesson(lesson) : () => router.push(`/student/lessons/${lesson.id}`)}
                   >
                     <TableCell className="whitespace-nowrap font-medium">
                       {formatDate(lesson.date)}
@@ -168,15 +163,8 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                       {formatShortDate(lesson.createdAt)}
                     </TableCell>
                     {isAdmin && (
-                      <TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
                         <div className="flex flex-nowrap justify-center gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setEditingLesson(lesson)}
-                          >
-                            수정
-                          </Button>
                           <Button
                             variant="outline"
                             size="sm"
