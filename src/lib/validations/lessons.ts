@@ -18,3 +18,7 @@ export const lessonFormSchema = z.object({
 });
 
 export type LessonFormInput = z.infer<typeof lessonFormSchema>;
+
+export const studentMemoSchema = z.object({
+  memo: z.string().max(2000, '메모는 2000자 이하로 입력해주세요.'),
+});

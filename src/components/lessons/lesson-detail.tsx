@@ -1,10 +1,12 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 import { RecordingSection } from '@/components/recordings';
+import { StudentMemoSection } from './student-memo-section';
 import type { Lesson } from '@/lib/db';
 
 interface LessonDetailProps {
   lesson: Lesson;
   canUpload?: boolean;
+  showMemo?: boolean;
 }
 
 function formatDate(date: Date): string {
@@ -15,7 +17,7 @@ function formatDate(date: Date): string {
   });
 }
 
-export function LessonDetail({ lesson, canUpload = false }: LessonDetailProps) {
+export function LessonDetail({ lesson, canUpload = false, showMemo = false }: LessonDetailProps) {
   return (
     <Card>
       <CardHeader>
@@ -32,6 +34,12 @@ export function LessonDetail({ lesson, canUpload = false }: LessonDetailProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="whitespace-pre-wrap break-words leading-relaxed text-foreground/90">{lesson.content}</div>
+        {showMemo && (
+          <>
+            <div className="border-t border-border/40" />
+            <StudentMemoSection lessonId={lesson.id} initialMemo={lesson.studentMemo ?? null} />
+          </>
+        )}
         <div className="border-t border-border/40 pt-6">
         <RecordingSection
           lessonId={lesson.id}

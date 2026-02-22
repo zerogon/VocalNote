@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { eq, desc } from 'drizzle-orm';
 import { db, lessons, type Lesson } from '@/lib/db';
-import { lessonFormSchema } from '@/lib/validations/lessons';
+import { lessonFormSchema, studentMemoSchema } from '@/lib/validations/lessons';
+import { getSession } from '@/lib/auth/session';
 import { deleteFile } from '@/lib/google-drive';
 
 export interface ActionResult {
@@ -115,6 +116,41 @@ export async function deleteLesson(id: number): Promise<ActionResult> {
 
   revalidatePath(`/admin/students/${lesson.studentId}/lessons`);
   revalidatePath('/student/dashboard');
+  return { success: true };
+}
+
+export async function saveStudentMemo(
+  lessonId: number,
+  memo: string
+): Promise<ActionResult> {
+  const sessionData = await getSession();
+  if (!sessionData?.user) {
+    return { error: '로그인이 필요합니다.' };
+  }
+
+  const result = studentMemoSchema.safeParse({ memo });
+  if (!result.success) {
+    return { error: result.error.errors[0].message };
+  }
+
+  const lesson = await getLessonById(lessonId);
+  if (!lesson) {
+    return { error: '레슨을 찾을 수 없습니다.' };
+  }
+
+  if (lesson.studentId !== sessionData.user.id) {
+    return { error: '권한이 없습니다.' };
+  }
+
+  await db
+    .update(lessons)
+    .set({
+      studentMemo: result.data.memo.trim() || null,
+      updatedAt: new Date(),
+    })
+    .where(eq(lessons.id, lessonId));
+
+  revalidatePath(`/student/lessons/${lessonId}`);
   return { success: true };
 }
 

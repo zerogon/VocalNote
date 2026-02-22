@@ -39,6 +39,7 @@ export const lessons = pgTable('lessons', {
   sessionNumber: integer('session_number').notNull().default(1),
   content: text('content').notNull(),
   recordingId: varchar('recording_id', { length: 255 }),
+  studentMemo: text('student_memo'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

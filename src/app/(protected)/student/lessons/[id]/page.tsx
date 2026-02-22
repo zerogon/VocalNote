@@ -43,7 +43,7 @@ export default async function LessonDetailPage({
           <Link href="/student/dashboard">목록으로</Link>
         </Button>
       </div>
-      <LessonDetail lesson={lesson} canUpload={sessionData.user.canUpload} />
+      <LessonDetail lesson={lesson} canUpload={sessionData.user.canUpload} showMemo />
     </div>
   );
 }
