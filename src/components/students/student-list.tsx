@@ -78,7 +78,7 @@ export function StudentList({ students }: StudentListProps) {
                         {student.phone}
                       </p>
                       {student.latestActivityAt && (
-                        <p className="text-xs text-muted-foreground">{formatRelativeTime(student.latestActivityAt)}</p>
+                        <p className="text-xs text-primary/50">{formatRelativeTime(student.latestActivityAt)}</p>
                       )}
                     </div>
                     <div onClick={(e) => e.stopPropagation()}>
@@ -141,7 +141,7 @@ export function StudentList({ students }: StudentListProps) {
                         )}
                       </div>
                       {student.latestActivityAt && (
-                        <p className="text-xs text-muted-foreground mt-0.5">{formatRelativeTime(student.latestActivityAt)}</p>
+                        <p className="text-xs text-primary/50 mt-0.5">{formatRelativeTime(student.latestActivityAt)}</p>
                       )}
                     </TableCell>
                     <TableCell>{student.phone}</TableCell>

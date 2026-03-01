@@ -19,7 +19,12 @@ import { LessonForm } from './lesson-form';
 import { DeleteDialog } from './delete-dialog';
 import type { Lesson } from '@/lib/db';
 
-type LessonWithRecording = Lesson & { hasRecording: boolean; recordingCount: number };
+type LessonWithRecording = Lesson & {
+  hasRecording: boolean;
+  recordingCount: number;
+  latestRecordingAt: Date | null;
+  memoUpdatedAt: Date | null;
+};
 
 interface LessonListProps {
   lessons: LessonWithRecording[];
@@ -41,6 +46,17 @@ function formatShortDate(date: Date): string {
     month: '2-digit',
     day: '2-digit',
   });
+}
+
+function formatRelativeTime(date: Date): string {
+  const diffMins = Math.floor((Date.now() - date.getTime()) / 60000);
+  if (diffMins < 1) return '방금 전';
+  if (diffMins < 60) return `${diffMins}분 전`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}시간 전`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}일 전`;
+  return date.toLocaleDateString('ko-KR');
 }
 
 export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
@@ -75,29 +91,37 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                 onClick={isAdmin ? () => setEditingLesson(lesson) : () => router.push(`/student/lessons/${lesson.id}`)}
               >
                 <CardContent className="p-4">
-                  <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-primary">
-                        {formatDate(lesson.date)}
-                      </span>
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                        {lesson.sessionNumber}회차
-                      </span>
+                  {/* 1행: 날짜 + 회차 */}
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="text-sm font-medium text-primary">
+                      {formatDate(lesson.date)}
+                    </span>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                      {lesson.sessionNumber}회차
+                    </span>
+                  </div>
+
+                  {/* 2행: 활동 배지 (녹음/메모 있을 때만) */}
+                  {(lesson.recordingCount > 0 || lesson.studentMemo) && (
+                    <div className="mb-2 flex flex-wrap gap-1.5">
                       {lesson.recordingCount > 0 && (
                         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                          녹음 {lesson.recordingCount}개
+                          🎙 {lesson.recordingCount}개
+                          {lesson.latestRecordingAt && (
+                            <> · {formatRelativeTime(lesson.latestRecordingAt)}</>
+                          )}
                         </span>
                       )}
                       {lesson.studentMemo && (
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                          메모
+                        <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
+                          📝 메모
+                          {lesson.memoUpdatedAt && (
+                            <> · {formatRelativeTime(lesson.memoUpdatedAt)}</>
+                          )}
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {formatShortDate(lesson.createdAt)}
-                    </span>
-                  </div>
+                  )}
                   {lesson.songTitle && (
                     <p className="mb-1 text-sm font-medium text-foreground">
                       {lesson.songTitle}
@@ -136,7 +160,6 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                   <TableHead className="w-20 text-center whitespace-nowrap">회차</TableHead>
                   <TableHead className="w-20 text-center">녹음</TableHead>
                   <TableHead className="w-20 text-center">메모</TableHead>
-                  <TableHead className="w-32 text-center">등록일</TableHead>
                   {isAdmin && (
                     <TableHead className="text-center">관리</TableHead>
                   )}
@@ -160,22 +183,33 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                     </TableCell>
                     <TableCell className="text-center">
                       {lesson.recordingCount > 0 ? (
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                          {lesson.recordingCount}개
-                        </span>
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                            🎙 {lesson.recordingCount}개
+                          </span>
+                          {lesson.latestRecordingAt && (
+                            <span className="text-xs text-muted-foreground">
+                              {formatRelativeTime(lesson.latestRecordingAt)}
+                            </span>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
                     </TableCell>
                     <TableCell className="text-center">
                       {lesson.studentMemo ? (
-                        <span className="inline-block h-2 w-2 rounded-full bg-primary" title="메모 있음" />
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className="inline-block h-2 w-2 rounded-full bg-primary" title="메모 있음" />
+                          {lesson.memoUpdatedAt && (
+                            <span className="text-xs text-muted-foreground">
+                              {formatRelativeTime(lesson.memoUpdatedAt)}
+                            </span>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
-                    </TableCell>
-                    <TableCell className="text-center text-muted-foreground">
-                      {formatShortDate(lesson.createdAt)}
                     </TableCell>
                     {isAdmin && (
                       <TableCell onClick={(e) => e.stopPropagation()}>

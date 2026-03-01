@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { eq, desc, count } from 'drizzle-orm';
+import { eq, desc, count, max } from 'drizzle-orm';
 import { db, lessons, recordings, type Lesson } from '@/lib/db';
 import { lessonFormSchema, studentMemoSchema } from '@/lib/validations/lessons';
 import { getSession } from '@/lib/auth/session';
@@ -14,11 +14,12 @@ export interface ActionResult {
 
 export async function getLessonsWithRecordingStatus(
   studentId: number
-): Promise<(Lesson & { hasRecording: boolean; recordingCount: number })[]> {
+): Promise<(Lesson & { hasRecording: boolean; recordingCount: number; latestRecordingAt: Date | null; memoUpdatedAt: Date | null })[]> {
   const result = await db
     .select({
       lesson: lessons,
       recordingCount: count(recordings.id),
+      latestRecordingAt: max(recordings.createdAt),
     })
     .from(lessons)
     .leftJoin(recordings, eq(recordings.lessonId, lessons.id))
@@ -30,6 +31,8 @@ export async function getLessonsWithRecordingStatus(
     ...r.lesson,
     hasRecording: r.recordingCount > 0,
     recordingCount: r.recordingCount,
+    latestRecordingAt: r.latestRecordingAt ?? null,
+    memoUpdatedAt: r.lesson.studentMemo ? r.lesson.updatedAt : null,
   }));
 }
 
