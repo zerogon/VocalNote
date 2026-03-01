@@ -1,13 +1,18 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { eq, count } from 'drizzle-orm';
-import { db, users, lessons, type User } from '@/lib/db';
+import { eq, count, max, isNotNull } from 'drizzle-orm';
+import { db, users, lessons, recordings, type User } from '@/lib/db';
 import { studentFormSchema } from '@/lib/validations/auth';
 
 export interface ActionResult {
   success?: boolean;
   error?: string;
+}
+
+export interface StudentWithActivity extends User {
+  latestActivityAt: Date | null;
+  latestActivityType: 'recording' | 'memo' | null;
 }
 
 export async function getAdminStats() {
@@ -24,13 +29,60 @@ export async function getAdminStats() {
   };
 }
 
-export async function getStudents(): Promise<User[]> {
-  const result = await db
-    .select()
-    .from(users)
-    .where(eq(users.role, 'user'))
-    .orderBy(users.createdAt);
-  return result;
+export async function getStudents(): Promise<StudentWithActivity[]> {
+  const [allStudents, latestRecordings, latestMemos] = await Promise.all([
+    db.select().from(users).where(eq(users.role, 'user')),
+    db
+      .select({ studentId: lessons.studentId, latestAt: max(recordings.createdAt) })
+      .from(recordings)
+      .innerJoin(lessons, eq(recordings.lessonId, lessons.id))
+      .groupBy(lessons.studentId),
+    db
+      .select({ studentId: lessons.studentId, latestAt: max(lessons.updatedAt) })
+      .from(lessons)
+      .where(isNotNull(lessons.studentMemo))
+      .groupBy(lessons.studentId),
+  ]);
+
+  const recordingMap = new Map(latestRecordings.map((r) => [r.studentId, r.latestAt]));
+  const memoMap = new Map(latestMemos.map((m) => [m.studentId, m.latestAt]));
+
+  const studentsWithActivity: StudentWithActivity[] = allStudents.map((student) => {
+    const recAt = recordingMap.get(student.id) ?? null;
+    const memoAt = memoMap.get(student.id) ?? null;
+
+    let latestActivityAt: Date | null = null;
+    let latestActivityType: 'recording' | 'memo' | null = null;
+
+    if (recAt && memoAt) {
+      if (recAt >= memoAt) {
+        latestActivityAt = recAt;
+        latestActivityType = 'recording';
+      } else {
+        latestActivityAt = memoAt;
+        latestActivityType = 'memo';
+      }
+    } else if (recAt) {
+      latestActivityAt = recAt;
+      latestActivityType = 'recording';
+    } else if (memoAt) {
+      latestActivityAt = memoAt;
+      latestActivityType = 'memo';
+    }
+
+    return { ...student, latestActivityAt, latestActivityType };
+  });
+
+  studentsWithActivity.sort((a, b) => {
+    if (a.latestActivityAt && b.latestActivityAt) {
+      return b.latestActivityAt.getTime() - a.latestActivityAt.getTime();
+    }
+    if (a.latestActivityAt) return -1;
+    if (b.latestActivityAt) return 1;
+    return a.createdAt.getTime() - b.createdAt.getTime();
+  });
+
+  return studentsWithActivity;
 }
 
 export async function addStudent(formData: FormData): Promise<ActionResult> {

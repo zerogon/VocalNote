@@ -17,9 +17,21 @@ import { UploadToggle } from './upload-toggle';
 import { DeleteDialog } from './delete-dialog';
 import { StudentForm } from './student-form';
 import type { User } from '@/lib/db';
+import type { StudentWithActivity } from '@/actions/students';
 
 interface StudentListProps {
-  students: User[];
+  students: StudentWithActivity[];
+}
+
+function formatRelativeTime(date: Date): string {
+  const diffMins = Math.floor((Date.now() - date.getTime()) / 60000);
+  if (diffMins < 1) return '방금 전';
+  if (diffMins < 60) return `${diffMins}분 전`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}시간 전`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}일 전`;
+  return date.toLocaleDateString('ko-KR');
 }
 
 export function StudentList({ students }: StudentListProps) {
@@ -53,10 +65,21 @@ export function StudentList({ students }: StudentListProps) {
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                      <p className="font-semibold">{student.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold">{student.name}</p>
+                        {student.latestActivityType === 'recording' && (
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">🎙 녹음</span>
+                        )}
+                        {student.latestActivityType === 'memo' && (
+                          <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">📝 메모</span>
+                        )}
+                      </div>
                       <p className="text-sm text-muted-foreground">
                         {student.phone}
                       </p>
+                      {student.latestActivityAt && (
+                        <p className="text-xs text-muted-foreground">{formatRelativeTime(student.latestActivityAt)}</p>
+                      )}
                     </div>
                     <div onClick={(e) => e.stopPropagation()}>
                       <UploadToggle
@@ -108,7 +131,18 @@ export function StudentList({ students }: StudentListProps) {
                     onClick={() => router.push(`/admin/students/${student.id}/lessons`)}
                   >
                     <TableCell className="font-medium">
-                      {student.name}
+                      <div className="flex items-center gap-2">
+                        <span>{student.name}</span>
+                        {student.latestActivityType === 'recording' && (
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">🎙 녹음</span>
+                        )}
+                        {student.latestActivityType === 'memo' && (
+                          <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">📝 메모</span>
+                        )}
+                      </div>
+                      {student.latestActivityAt && (
+                        <p className="text-xs text-muted-foreground mt-0.5">{formatRelativeTime(student.latestActivityAt)}</p>
+                      )}
                     </TableCell>
                     <TableCell>{student.phone}</TableCell>
                     <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
