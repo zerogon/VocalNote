@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { eq } from 'drizzle-orm';
 import { Button } from '@/components/ui';
 import { LessonList } from '@/components/lessons';
-import { getLessonsByStudent } from '@/actions/lessons';
+import { getLessonsWithRecordingStatus } from '@/actions/lessons';
 import { db, users } from '@/lib/db';
 
 interface LessonsPageProps {
@@ -33,7 +33,7 @@ export default async function LessonsPage({ params }: LessonsPageProps) {
     notFound();
   }
 
-  const lessons = await getLessonsByStudent(studentId);
+  const lessons = await getLessonsWithRecordingStatus(studentId);
 
   return (
     <div>

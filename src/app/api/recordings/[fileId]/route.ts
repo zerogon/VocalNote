@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
-import { db, lessons } from '@/lib/db';
+import { db, recordings, lessons } from '@/lib/db';
 import { getSession } from '@/lib/auth/session';
 import { getFileStream } from '@/lib/google-drive';
 
@@ -16,14 +16,15 @@ export async function GET(
   const { fileId } = await params;
   const isAdmin = sessionData.session.role === 'admin';
 
-  // 해당 fileId를 가진 레슨 조회
-  const lesson = await db
-    .select()
-    .from(lessons)
-    .where(eq(lessons.recordingId, fileId))
+  // 해당 fileId를 가진 recordings 조회 후 lesson studentId 획득
+  const result = await db
+    .select({ lesson: lessons })
+    .from(recordings)
+    .innerJoin(lessons, eq(recordings.lessonId, lessons.id))
+    .where(eq(recordings.fileId, fileId))
     .limit(1);
 
-  if (lesson.length === 0) {
+  if (result.length === 0) {
     return NextResponse.json(
       { error: '녹음 파일을 찾을 수 없습니다.' },
       { status: 404 }
@@ -32,7 +33,7 @@ export async function GET(
 
   // 학생은 본인 레슨만 접근 가능
   if (!isAdmin) {
-    if (!sessionData.user || lesson[0].studentId !== sessionData.user.id) {
+    if (!sessionData.user || result[0].lesson.studentId !== sessionData.user.id) {
       return NextResponse.json({ error: '권한이 없습니다.' }, { status: 403 });
     }
   }

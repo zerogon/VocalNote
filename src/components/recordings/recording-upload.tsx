@@ -8,11 +8,13 @@ import { validateAudioFile } from '@/lib/validations/recording';
 interface RecordingUploadProps {
   lessonId: number;
   label?: string;
+  onUploaded?: () => void;
 }
 
 export function RecordingUpload({
   lessonId,
   label = '녹음 업로드',
+  onUploaded,
 }: RecordingUploadProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -57,6 +59,7 @@ export function RecordingUpload({
       if (inputRef.current) inputRef.current.value = '';
 
       if (xhr.status >= 200 && xhr.status < 300) {
+        onUploaded?.();
         router.refresh();
       } else {
         try {

@@ -1,8 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { eq, desc } from 'drizzle-orm';
-import { db, lessons, type Lesson } from '@/lib/db';
+import { eq, desc, count } from 'drizzle-orm';
+import { db, lessons, recordings, type Lesson } from '@/lib/db';
 import { lessonFormSchema, studentMemoSchema } from '@/lib/validations/lessons';
 import { getSession } from '@/lib/auth/session';
 import { deleteFile } from '@/lib/google-drive';
@@ -12,12 +12,25 @@ export interface ActionResult {
   error?: string;
 }
 
-export async function getLessonsByStudent(studentId: number): Promise<Lesson[]> {
-  return db
-    .select()
+export async function getLessonsWithRecordingStatus(
+  studentId: number
+): Promise<(Lesson & { hasRecording: boolean; recordingCount: number })[]> {
+  const result = await db
+    .select({
+      lesson: lessons,
+      recordingCount: count(recordings.id),
+    })
     .from(lessons)
+    .leftJoin(recordings, eq(recordings.lessonId, lessons.id))
     .where(eq(lessons.studentId, studentId))
+    .groupBy(lessons.id)
     .orderBy(desc(lessons.date));
+
+  return result.map((r) => ({
+    ...r.lesson,
+    hasRecording: r.recordingCount > 0,
+    recordingCount: r.recordingCount,
+  }));
 }
 
 export async function getLessonById(id: number): Promise<Lesson | null> {
@@ -103,10 +116,15 @@ export async function deleteLesson(id: number): Promise<ActionResult> {
     return { error: '레슨을 찾을 수 없습니다.' };
   }
 
-  // 연결된 녹음 파일이 있으면 Drive에서 삭제
-  if (lesson.recordingId) {
+  // 연결된 녹음 파일 모두 Drive에서 삭제
+  const lessonRecordings = await db
+    .select()
+    .from(recordings)
+    .where(eq(recordings.lessonId, id));
+
+  for (const recording of lessonRecordings) {
     try {
-      await deleteFile(lesson.recordingId);
+      await deleteFile(recording.fileId);
     } catch {
       // Drive 파일 삭제 실패는 무시
     }
@@ -154,29 +172,3 @@ export async function saveStudentMemo(
   return { success: true };
 }
 
-export async function removeRecording(lessonId: number): Promise<ActionResult> {
-  const lesson = await getLessonById(lessonId);
-  if (!lesson) {
-    return { error: '레슨을 찾을 수 없습니다.' };
-  }
-
-  if (!lesson.recordingId) {
-    return { error: '녹음 파일이 없습니다.' };
-  }
-
-  try {
-    await deleteFile(lesson.recordingId);
-  } catch {
-    // Drive 파일 삭제 실패는 무시
-  }
-
-  await db
-    .update(lessons)
-    .set({ recordingId: null, updatedAt: new Date() })
-    .where(eq(lessons.id, lessonId));
-
-  revalidatePath(`/admin/students/${lesson.studentId}/lessons`);
-  revalidatePath('/student/dashboard');
-  revalidatePath(`/student/lessons/${lessonId}`);
-  return { success: true };
-}

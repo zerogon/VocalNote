@@ -45,7 +45,7 @@ export function DeleteDialog({
           </DialogDescription>
           {hasRecording && (
             <p className="mt-2 text-sm font-medium text-destructive">
-              연결된 녹음 파일도 함께 삭제됩니다.
+              연결된 녹음 파일이 있으면 함께 삭제됩니다.
             </p>
           )}
         </DialogHeader>

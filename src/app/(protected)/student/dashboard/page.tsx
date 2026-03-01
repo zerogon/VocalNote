@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
 import { Card, CardContent } from '@/components/ui';
 import { LessonList } from '@/components/lessons';
-import { getLessonsByStudent } from '@/actions/lessons';
+import { getLessonsWithRecordingStatus } from '@/actions/lessons';
 
 export default async function StudentDashboard() {
   const sessionData = await getSession();
@@ -11,7 +11,7 @@ export default async function StudentDashboard() {
     redirect('/login/student');
   }
 
-  const lessons = await getLessonsByStudent(sessionData.user.id);
+  const lessons = await getLessonsWithRecordingStatus(sessionData.user.id);
 
   const lastLesson = lessons.length > 0 ? lessons[0] : null;
 

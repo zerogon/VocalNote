@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 import { RecordingSection } from '@/components/recordings';
 import { StudentMemoSection } from './student-memo-section';
+import { getRecordingsByLesson } from '@/actions/recordings';
 import type { Lesson } from '@/lib/db';
 
 interface LessonDetailProps {
@@ -17,7 +18,9 @@ function formatDate(date: Date): string {
   });
 }
 
-export function LessonDetail({ lesson, canUpload = false, showMemo = false }: LessonDetailProps) {
+export async function LessonDetail({ lesson, canUpload = false, showMemo = false }: LessonDetailProps) {
+  const recordings = await getRecordingsByLesson(lesson.id);
+
   return (
     <Card>
       <CardHeader>
@@ -41,11 +44,11 @@ export function LessonDetail({ lesson, canUpload = false, showMemo = false }: Le
           </>
         )}
         <div className="border-t border-border/40 pt-6">
-        <RecordingSection
-          lessonId={lesson.id}
-          recordingId={lesson.recordingId}
-          canUpload={canUpload}
-        />
+          <RecordingSection
+            lessonId={lesson.id}
+            recordings={recordings}
+            canUpload={canUpload}
+          />
         </div>
       </CardContent>
     </Card>

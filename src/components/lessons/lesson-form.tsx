@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition, useState } from 'react';
+import { useTransition, useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -14,8 +14,9 @@ import {
   Textarea,
 } from '@/components/ui';
 import { addLesson, updateLesson } from '@/actions/lessons';
-import type { Lesson } from '@/lib/db';
+import { getRecordingsByLesson } from '@/actions/recordings';
 import { RecordingSection } from '@/components/recordings/recording-section';
+import type { Lesson, Recording } from '@/lib/db';
 
 interface LessonFormProps {
   studentId: number;
@@ -37,8 +38,24 @@ export function LessonForm({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [selectedSession, setSelectedSession] = useState(lesson?.sessionNumber ?? 1);
+  const [recordings, setRecordings] = useState<Recording[]>([]);
 
   const isEditing = !!lesson;
+
+  const fetchRecordings = useCallback(async () => {
+    if (lesson?.id) {
+      const data = await getRecordingsByLesson(lesson.id);
+      setRecordings(data);
+    }
+  }, [lesson?.id]);
+
+  useEffect(() => {
+    if (isEditing && open) {
+      fetchRecordings();
+    } else {
+      setRecordings([]);
+    }
+  }, [isEditing, open, fetchRecordings]);
 
   const handleSubmit = (formData: FormData) => {
     setError(null);
@@ -135,12 +152,13 @@ export function LessonForm({
             </Button>
           </DialogFooter>
         </form>
-        {isEditing && lesson.recordingId && (
+        {isEditing && (
           <div className="border-t border-border/40 pt-4">
             <RecordingSection
               lessonId={lesson.id}
-              recordingId={lesson.recordingId}
-              canUpload={false}
+              recordings={recordings}
+              canUpload={true}
+              onMutated={fetchRecordings}
             />
           </div>
         )}

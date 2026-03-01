@@ -19,8 +19,10 @@ import { LessonForm } from './lesson-form';
 import { DeleteDialog } from './delete-dialog';
 import type { Lesson } from '@/lib/db';
 
+type LessonWithRecording = Lesson & { hasRecording: boolean; recordingCount: number };
+
 interface LessonListProps {
-  lessons: Lesson[];
+  lessons: LessonWithRecording[];
   isAdmin: boolean;
   studentId?: number;
 }
@@ -43,8 +45,8 @@ function formatShortDate(date: Date): string {
 
 export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
   const router = useRouter();
-  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
-  const [deletingLesson, setDeletingLesson] = useState<Lesson | null>(null);
+  const [editingLesson, setEditingLesson] = useState<LessonWithRecording | null>(null);
+  const [deletingLesson, setDeletingLesson] = useState<LessonWithRecording | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
 
 
@@ -81,9 +83,9 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                       <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
                         {lesson.sessionNumber}회차
                       </span>
-                      {lesson.recordingId && (
+                      {lesson.recordingCount > 0 && (
                         <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                          녹음
+                          녹음 {lesson.recordingCount}개
                         </span>
                       )}
                       {lesson.studentMemo && (
@@ -114,11 +116,9 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                       >
                         삭제
                       </Button>
-                      {!lesson.recordingId && (
-                        <div onClick={(e) => e.stopPropagation()}>
-                          <RecordingUpload lessonId={lesson.id} />
-                        </div>
-                      )}
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <RecordingUpload lessonId={lesson.id} />
+                      </div>
                     </div>
                   )}
                 </CardContent>
@@ -159,8 +159,10 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                       {lesson.sessionNumber}회차
                     </TableCell>
                     <TableCell className="text-center">
-                      {lesson.recordingId ? (
-                        <span className="inline-block h-2 w-2 rounded-full bg-primary" title="녹음 있음" />
+                      {lesson.recordingCount > 0 ? (
+                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                          {lesson.recordingCount}개
+                        </span>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
@@ -186,9 +188,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                           >
                             삭제
                           </Button>
-                          {!lesson.recordingId && (
-                            <RecordingUpload lessonId={lesson.id} label="업로드" />
-                          )}
+                          <RecordingUpload lessonId={lesson.id} label="업로드" />
                         </div>
                       </TableCell>
                     )}
@@ -220,7 +220,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
           {deletingLesson && (
             <DeleteDialog
               lessonId={deletingLesson.id}
-              hasRecording={!!deletingLesson.recordingId}
+              hasRecording={deletingLesson.hasRecording}
               open={!!deletingLesson}
               onOpenChange={(open) => !open && setDeletingLesson(null)}
             />
