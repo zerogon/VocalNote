@@ -59,12 +59,14 @@ export function StudentForm({ student, open, onOpenChange }: StudentFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">휴대폰 번호</Label>
+            <Label htmlFor="phone">휴대폰 번호 끝 4자리</Label>
             <Input
               id="phone"
               name="phone"
-              type="tel"
-              placeholder="01012345678"
+              type="text"
+              inputMode="numeric"
+              maxLength={4}
+              placeholder="1234"
               defaultValue={student?.phone ?? ''}
               required
             />

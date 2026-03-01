@@ -50,7 +50,6 @@ export async function getSession(): Promise<SessionData | null> {
     .limit(1);
 
   if (sessionResult.length === 0) {
-    await deleteSessionCookie();
     return null;
   }
 
@@ -76,7 +75,6 @@ export async function getSession(): Promise<SessionData | null> {
     .limit(1);
 
   if (userResult.length === 0) {
-    await deleteSessionCookie();
     return null;
   }
 

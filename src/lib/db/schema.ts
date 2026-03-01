@@ -14,7 +14,7 @@ export const roleEnum = pgEnum('role', ['admin', 'user']);
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
-  phone: varchar('phone', { length: 20 }).notNull().unique(),
+  phone: varchar('phone', { length: 4 }).notNull().unique(),
   role: roleEnum('role').default('user').notNull(),
   canUpload: boolean('can_upload').default(false).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),

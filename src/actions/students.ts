@@ -54,7 +54,7 @@ export async function addStudent(formData: FormData): Promise<ActionResult> {
     .limit(1);
 
   if (existing.length > 0) {
-    return { error: '이미 등록된 휴대폰 번호입니다.' };
+    return { error: '이미 등록된 번호입니다.' };
   }
 
   await db.insert(users).values({
@@ -91,7 +91,7 @@ export async function updateStudent(
     .limit(1);
 
   if (existing.length > 0 && existing[0].id !== id) {
-    return { error: '이미 등록된 휴대폰 번호입니다.' };
+    return { error: '이미 등록된 번호입니다.' };
   }
 
   await db
