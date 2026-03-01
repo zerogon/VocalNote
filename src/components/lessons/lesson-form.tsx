@@ -36,6 +36,7 @@ export function LessonForm({
 }: LessonFormProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [selectedSession, setSelectedSession] = useState(lesson?.sessionNumber ?? 1);
 
   const isEditing = !!lesson;
 
@@ -82,19 +83,24 @@ export function LessonForm({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="sessionNumber">회차</Label>
-            <select
-              id="sessionNumber"
-              name="sessionNumber"
-              defaultValue={lesson?.sessionNumber ?? 1}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              {[1, 2, 3, 4].map((n) => (
-                <option key={n} value={n}>
+            <Label>회차</Label>
+            <input type="hidden" name="sessionNumber" value={selectedSession} />
+            <div className="grid grid-cols-4 gap-2">
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setSelectedSession(n)}
+                  className={`rounded-md border px-2 py-2 text-sm font-medium transition-colors
+                    ${selectedSession === n
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground'
+                    }`}
+                >
                   {n}회차
-                </option>
+                </button>
               ))}
-            </select>
+            </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="content">레슨 내용</Label>

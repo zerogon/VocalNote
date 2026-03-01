@@ -10,7 +10,7 @@ export const lessonFormSchema = z.object({
     .number()
     .int()
     .min(1, '회차는 1 이상이어야 합니다.')
-    .max(4, '회차는 1~4 사이여야 합니다.'),
+    .max(12, '회차는 1~12 사이여야 합니다.'),
   content: z
     .string()
     .min(1, '레슨 내용을 입력해주세요.')
