@@ -39,6 +39,7 @@ export const lessons = pgTable('lessons', {
   sessionNumber: integer('session_number').notNull().default(1),
   content: text('content').notNull(),
   studentMemo: text('student_memo'),
+  adminViewedAt: timestamp('admin_viewed_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

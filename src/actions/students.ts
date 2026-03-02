@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { eq, count, max, isNotNull } from 'drizzle-orm';
+import { eq, count, max, isNotNull, isNull, or, gt, and } from 'drizzle-orm';
 import { db, users, lessons, recordings, type User } from '@/lib/db';
 import { studentFormSchema } from '@/lib/validations/auth';
 
@@ -36,11 +36,25 @@ export async function getStudents(): Promise<StudentWithActivity[]> {
       .select({ studentId: lessons.studentId, latestAt: max(recordings.createdAt) })
       .from(recordings)
       .innerJoin(lessons, eq(recordings.lessonId, lessons.id))
+      .where(
+        or(
+          isNull(lessons.adminViewedAt),
+          gt(recordings.createdAt, lessons.adminViewedAt)
+        )
+      )
       .groupBy(lessons.studentId),
     db
       .select({ studentId: lessons.studentId, latestAt: max(lessons.updatedAt) })
       .from(lessons)
-      .where(isNotNull(lessons.studentMemo))
+      .where(
+        and(
+          isNotNull(lessons.studentMemo),
+          or(
+            isNull(lessons.adminViewedAt),
+            gt(lessons.updatedAt, lessons.adminViewedAt)
+          )
+        )
+      )
       .groupBy(lessons.studentId),
   ]);
 

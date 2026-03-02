@@ -14,7 +14,7 @@ export interface ActionResult {
 
 export async function getLessonsWithRecordingStatus(
   studentId: number
-): Promise<(Lesson & { hasRecording: boolean; recordingCount: number; latestRecordingAt: Date | null; memoUpdatedAt: Date | null })[]> {
+): Promise<(Lesson & { hasRecording: boolean; recordingCount: number; latestRecordingAt: Date | null; memoUpdatedAt: Date | null; adminViewedAt: Date | null })[]> {
   const result = await db
     .select({
       lesson: lessons,
@@ -33,7 +33,15 @@ export async function getLessonsWithRecordingStatus(
     recordingCount: r.recordingCount,
     latestRecordingAt: r.latestRecordingAt ?? null,
     memoUpdatedAt: r.lesson.studentMemo ? r.lesson.updatedAt : null,
+    adminViewedAt: r.lesson.adminViewedAt ?? null,
   }));
+}
+
+export async function markLessonAsViewed(lessonId: number): Promise<void> {
+  await db
+    .update(lessons)
+    .set({ adminViewedAt: new Date() })
+    .where(eq(lessons.id, lessonId));
 }
 
 export async function getLessonById(id: number): Promise<Lesson | null> {

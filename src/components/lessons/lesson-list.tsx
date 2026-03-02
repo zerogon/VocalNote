@@ -17,6 +17,7 @@ import {
 import { RecordingUpload } from '@/components/recordings';
 import { LessonForm } from './lesson-form';
 import { DeleteDialog } from './delete-dialog';
+import { markLessonAsViewed } from '@/actions/lessons';
 import type { Lesson } from '@/lib/db';
 
 type LessonWithRecording = Lesson & {
@@ -24,7 +25,18 @@ type LessonWithRecording = Lesson & {
   recordingCount: number;
   latestRecordingAt: Date | null;
   memoUpdatedAt: Date | null;
+  adminViewedAt: Date | null;
 };
+
+function hasNewActivity(lesson: LessonWithRecording): boolean {
+  const { adminViewedAt, latestRecordingAt, memoUpdatedAt, recordingCount, studentMemo } = lesson;
+  if (!adminViewedAt) {
+    return recordingCount > 0 || !!studentMemo;
+  }
+  const newRec = latestRecordingAt && latestRecordingAt > adminViewedAt;
+  const newMemo = memoUpdatedAt && memoUpdatedAt > adminViewedAt;
+  return !!(newRec || newMemo);
+}
 
 interface LessonListProps {
   lessons: LessonWithRecording[];
@@ -64,6 +76,19 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
   const [editingLesson, setEditingLesson] = useState<LessonWithRecording | null>(null);
   const [deletingLesson, setDeletingLesson] = useState<LessonWithRecording | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [viewedLessonIds, setViewedLessonIds] = useState<Set<number>>(new Set());
+
+  function isNew(lesson: LessonWithRecording): boolean {
+    return hasNewActivity(lesson) && !viewedLessonIds.has(lesson.id);
+  }
+
+  async function handleLessonClick(lesson: LessonWithRecording) {
+    if (hasNewActivity(lesson)) {
+      setViewedLessonIds((prev) => new Set([...prev, lesson.id]));
+      await markLessonAsViewed(lesson.id);
+    }
+    setEditingLesson(lesson);
+  }
 
 
   return (
@@ -88,7 +113,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
               <Card
                 key={lesson.id}
                 className="cursor-pointer transition-colors hover:bg-muted/50"
-                onClick={isAdmin ? () => setEditingLesson(lesson) : () => router.push(`/student/lessons/${lesson.id}`)}
+                onClick={isAdmin ? () => handleLessonClick(lesson) : () => router.push(`/student/lessons/${lesson.id}`)}
               >
                 <CardContent className="p-4">
                   {/* 1행: 날짜 + 회차 */}
@@ -96,9 +121,16 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                     <span className="text-sm font-medium text-primary">
                       {formatDate(lesson.date)}
                     </span>
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                      {lesson.sessionNumber}회차
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {isAdmin && isNew(lesson) && (
+                        <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">
+                          NEW
+                        </span>
+                      )}
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                        {lesson.sessionNumber}회차
+                      </span>
+                    </div>
                   </div>
 
                   {/* 2행: 활동 배지 (녹음/메모 있을 때만) */}
@@ -170,10 +202,17 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                   <TableRow
                     key={lesson.id}
                     className="cursor-pointer transition-colors hover:bg-muted/50"
-                    onClick={isAdmin ? () => setEditingLesson(lesson) : () => router.push(`/student/lessons/${lesson.id}`)}
+                    onClick={isAdmin ? () => handleLessonClick(lesson) : () => router.push(`/student/lessons/${lesson.id}`)}
                   >
                     <TableCell className="whitespace-nowrap font-medium">
-                      {formatDate(lesson.date)}
+                      <div className="flex items-center gap-1.5">
+                        {isAdmin && isNew(lesson) && (
+                          <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">
+                            NEW
+                          </span>
+                        )}
+                        {formatDate(lesson.date)}
+                      </div>
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate">
                       {lesson.songTitle || '-'}
@@ -188,7 +227,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                             🎙 {lesson.recordingCount}개
                           </span>
                           {lesson.latestRecordingAt && (
-                            <span className="text-xs text-muted-foreground">
+                            <span className="whitespace-nowrap text-xs text-muted-foreground">
                               {formatRelativeTime(lesson.latestRecordingAt)}
                             </span>
                           )}
@@ -202,7 +241,7 @@ export function LessonList({ lessons, isAdmin, studentId }: LessonListProps) {
                         <div className="flex flex-col items-center gap-0.5">
                           <span className="inline-block h-2 w-2 rounded-full bg-primary" title="메모 있음" />
                           {lesson.memoUpdatedAt && (
-                            <span className="text-xs text-muted-foreground">
+                            <span className="whitespace-nowrap text-xs text-muted-foreground">
                               {formatRelativeTime(lesson.memoUpdatedAt)}
                             </span>
                           )}

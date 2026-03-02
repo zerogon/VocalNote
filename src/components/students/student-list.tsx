@@ -67,6 +67,9 @@ export function StudentList({ students }: StudentListProps) {
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold">{student.name}</p>
+                        {student.latestActivityAt && (
+                          <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">NEW</span>
+                        )}
                         {student.latestActivityType === 'recording' && (
                           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">🎙 녹음</span>
                         )}
@@ -133,6 +136,9 @@ export function StudentList({ students }: StudentListProps) {
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
                         <span>{student.name}</span>
+                        {student.latestActivityAt && (
+                          <span className="rounded-full bg-destructive px-1.5 py-0.5 text-[10px] font-bold text-white">NEW</span>
+                        )}
                         {student.latestActivityType === 'recording' && (
                           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">🎙 녹음</span>
                         )}

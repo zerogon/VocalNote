@@ -42,3 +42,5 @@ next-env.d.ts
 
 .claude
 prompt
+
+src/lib/db/migrations/*
