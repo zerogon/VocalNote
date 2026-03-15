@@ -19,6 +19,7 @@ export function AudioPlayer({ fileId }: AudioPlayerProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isLooping, setIsLooping] = useState(false);
 
   const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) {
@@ -34,8 +35,13 @@ export function AudioPlayer({ fileId }: AudioPlayerProps) {
   }, []);
 
   const handleEnded = useCallback(() => {
-    setIsPlaying(false);
-  }, []);
+    if (isLooping && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    } else {
+      setIsPlaying(false);
+    }
+  }, [isLooping]);
 
   const handleCanPlay = useCallback(() => {
     setIsLoading(false);
@@ -111,6 +117,15 @@ export function AudioPlayer({ fileId }: AudioPlayerProps) {
           {formatTime(duration)}
         </span>
       </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setIsLooping(!isLooping)}
+        className={`h-9 w-9 shrink-0 rounded-full p-0 ${isLooping ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}
+        title={isLooping ? '반복 끄기' : '반복 재생'}
+      >
+        <RepeatIcon />
+      </Button>
     </div>
   );
 }
@@ -127,6 +142,17 @@ function PauseIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
       <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+    </svg>
+  );
+}
+
+function RepeatIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 1l4 4-4 4" />
+      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+      <path d="M7 23l-4-4 4-4" />
+      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
     </svg>
   );
 }
